@@ -16,12 +16,15 @@ import com.example.splitease.ui.Utilities.SharedPref
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class Login : AppCompatActivity() {
 
     private lateinit var user: FirebaseUser
     private lateinit var auth: FirebaseAuth
+    val db = Firebase.firestore
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)

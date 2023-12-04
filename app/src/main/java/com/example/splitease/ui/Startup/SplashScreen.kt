@@ -22,9 +22,12 @@ class SplashScreen : AppCompatActivity() {
         supportActionBar?.hide()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) //remove night mode
 
+        val intent = Intent(this, Login::class.java)
+        startActivity(intent)
+        finish()
         Handler().postDelayed({
             if(auth.currentUser == null) { //if user not logged in
-                val intent = Intent(this, Login::class.java)
+                val intent = Intent(this, Signup::class.java)
                 startActivity(intent)
                 finish()
 

@@ -5,4 +5,7 @@ class UserDataModel() {
     val user_name = ""
     val user_bal = 00.00
     val user_trns = arrayListOf<String>()
+    val grp_id = ""
+    val grp_total = 00.00
+    val grp_name = ""
 }
