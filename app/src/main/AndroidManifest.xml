@@ -24,6 +24,8 @@
         </activity>
         <activity android:name=".ui.Startup.Signup"
             android:exported="true"/>
+        <activity android:name=".ui.Groups.CreateGroup"
+            android:exported="true"/>
 
         <activity
             android:name=".ui.Startup.SplashScreen"

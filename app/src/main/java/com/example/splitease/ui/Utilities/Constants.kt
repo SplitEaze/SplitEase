@@ -5,4 +5,6 @@ object Constants {
 
     val UUID = "uuid"
     val NAME = "name"
+    val GRPNAME = "grp_name"
+    val GRPCAT = "grp_cat"
 }

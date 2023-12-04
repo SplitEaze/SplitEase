@@ -13,4 +13,6 @@
     <string name="welcome_to_splitease">Welcome to SplitEase</string>
     <string name="full_name">Full Name</string>
     <string name="signup">Signup</string>
+    <string name="group_name">Group Name</string>
+    <string name="group_category">Group Category</string>
 </resources>
