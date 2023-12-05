@@ -34,14 +34,12 @@ class CreateGroup : AppCompatActivity() {
             auth = Firebase.auth
             user = auth.currentUser!!
 
-            val bundle = Bundle()
-            grpId = bundle.getString("grpId").toString()
-            Toast.makeText(this@CreateGroup, grpId, Toast.LENGTH_SHORT).show()
+            val bundle = intent.extras
+            grpId = bundle?.getString("grpId").toString()
 
             groupData["grp_id"] = grpId
-            groupData["grp_name"] = groupName
-            groupData["grp_total"] = 1000
-            groupData["grp_cat"] = groupCategory
+            groupData["grp_name"] = groupName.text.toString()
+            groupData["grp_cat"] = groupCategory.text.toString()
 
             db.collection("UserData").document(user.uid)
                 .collection("groups").document(grpId).set(groupData)
