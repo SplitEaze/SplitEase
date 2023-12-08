@@ -26,6 +26,8 @@
             android:exported="true"/>
         <activity android:name=".ui.Groups.CreateGroup"
             android:exported="true"/>
+        <activity android:name=".ui.DetailedGroup.DetailedGroup"
+            android:exported="true"/>
 
         <activity
             android:name=".ui.Startup.SplashScreen"

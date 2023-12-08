@@ -1,6 +1,5 @@
 package com.example.splitease.ui.Groups
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -11,25 +10,20 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.splitease.Models.GroupsDataModel
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
+import com.example.splitease.ui.DetailedGroup.DetailedGroup
 import com.example.splitease.ui.Groups.Adapter.GroupsAdapter
 import com.example.splitease.ui.Utilities.Constants
 import com.example.splitease.ui.Utilities.SharedPref
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import java.lang.Exception
 
 class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
-
-    private var grpName = ""
-    private var grpCat = ""
 
     private var documentDataList: MutableList<UserDataModel> = ArrayList()
     private lateinit var userItemModel: MutableList<UserDataModel>
@@ -37,6 +31,7 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
     var userAdaper: GroupsAdapter ?= null
     private lateinit var user: FirebaseUser
     private lateinit var auth: FirebaseAuth
+    private var groupId = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +50,8 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
             val newGroupRef = db.collection("UserData").document(user.uid)
                 .collection("groups").document()
             val intent = Intent(activity, CreateGroup::class.java)
-            intent.putExtra("grpId", newGroupRef.id)
+            groupId = newGroupRef.id
+            intent.putExtra("grpId", groupId)
             startActivity(intent)
         }
         getGroups()
@@ -89,9 +85,8 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
     }
 
     override fun onItemClick(position: Int) {
-//        val intent = Intent(activity, detailsActivity::class.java)
-//        intent.putExtra("booking_id", documentDataList[position].booking_id)
-//        intent.putExtra("size", documentDataList[position].size)
-//        startActivity(intent)
+        val intent = Intent(activity, DetailedGroup::class.java)
+        intent.putExtra("groupId", documentDataList[position].grp_id)
+        startActivity(intent)
     }
 }

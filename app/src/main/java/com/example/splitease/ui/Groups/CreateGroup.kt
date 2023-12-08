@@ -4,12 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.splitease.MainActivity
 import com.example.splitease.R
-import com.example.splitease.ui.Utilities.Constants
-import com.example.splitease.ui.Utilities.SharedPref
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -41,8 +38,22 @@ class CreateGroup : AppCompatActivity() {
             groupData["grp_name"] = groupName.text.toString()
             groupData["grp_cat"] = groupCategory.text.toString()
 
+            //Store group details in particular user db
             db.collection("UserData").document(user.uid)
                 .collection("groups").document(grpId).set(groupData)
+
+            val detailedGroupData = HashMap<String, Any>()
+
+            detailedGroupData["grp_id"] = grpId
+            detailedGroupData["grp_name"] = groupName.text.toString()
+            detailedGroupData["grp_cat"] = groupCategory.text.toString()
+            detailedGroupData["grp_total"] = 00.00
+            detailedGroupData["grp_transactions"] = arrayListOf<String>()
+            detailedGroupData["grp_users"] = arrayListOf<String>(user.uid)
+
+            //Store all details in the group db
+            db.collection("GroupData").document(grpId)
+                .set(detailedGroupData)
 
             val intent = Intent(this@CreateGroup, MainActivity::class.java)
             startActivity(intent)
