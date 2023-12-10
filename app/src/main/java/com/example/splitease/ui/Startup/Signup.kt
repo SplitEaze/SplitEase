@@ -82,7 +82,8 @@ class Signup : AppCompatActivity() {
                                 "user_trn" to ArrayList<String>()
                             )
 
-                            db.collection("UserData").document(user.uid).set(userData)
+                            db.collection("UserData").document(user.uid)
+                                .collection("users").document(user.uid).set(userData)
 
                             SharedPref(this@Signup).setString(Constants.UUID, user.uid)
                             SharedPref(this@Signup).setString(Constants.NAME, name.text.toString())

@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
 
-class UsersAdapter (var userItemModel: MutableList<UserDataModel>, var mClickListener: ItemClickListener)
+class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     : RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
     private lateinit var context: Context
 
@@ -21,17 +21,13 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>, var mClickLis
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         context = parent.context
 
-        val viewHolder = LayoutInflater.from(parent.context).inflate(R.layout.adapter_groups, parent, false)
+        val viewHolder = LayoutInflater.from(parent.context).inflate(R.layout.adapter_users, parent, false)
         return ViewHolder(viewHolder)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.groupHead.text = userItemModel[position].grp_name
         holder.totalSpends.text = userItemModel[position].grp_total.toString()
-
-        holder.itemView.setOnClickListener {
-            mClickListener.onItemClick(position)
-        }
     }
 
     override fun getItemCount(): Int {
@@ -41,9 +37,5 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>, var mClickLis
     fun updateList(temp: MutableList<UserDataModel>) {
         userItemModel = temp
         notifyDataSetChanged()
-    }
-
-    interface ItemClickListener{
-        fun onItemClick(position: Int)
     }
 }

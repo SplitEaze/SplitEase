@@ -13,6 +13,7 @@ import com.example.splitease.ui.DetailedGroup.Adapter.UsersAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import java.lang.Exception
 
 class DetailedGroup : AppCompatActivity() {
@@ -28,6 +29,7 @@ class DetailedGroup : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var groupId = ""
     private var transactionIds = ArrayList<Any>()
+    private var userIds = ArrayList<Any>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,13 +38,46 @@ class DetailedGroup : AppCompatActivity() {
         val bundle = intent.extras
         groupId = bundle?.getString("groupId").toString()
 
-//        rvUsers?.layoutManager = LinearLayoutManager(this)
+        findViewById<RecyclerView>(R.id.rvUsers)?.layoutManager = LinearLayoutManager(this)
         findViewById<RecyclerView>(R.id.rvTransactions)?.layoutManager = LinearLayoutManager(this)
 
-        getTransactionsIds()
+        getGroupUsers()
+        getAllGroupTransactions()
     }
 
-    private fun getTransactionsIds() {
+    private fun getGroupUsers() {
+        try {
+            db.collection("GroupData").document(groupId)
+                .get().addOnSuccessListener { it ->
+                    userIds = (it.get("grp_users") as ArrayList<Any>)
+                    for (tid in userIds){
+                        db.collection("UserData").document(tid.toString())
+                            .collection("users")
+                            .get().addOnSuccessListener {
+                                userItemModel = it.toObjects(UserDataModel::class.java)
+                                userDataList.addAll(userItemModel)
+                                setUserAdapter()
+                            }
+                    }
+                }
+        }
+        catch (e: Exception){
+            System.err.print("Some Error Occurred")
+        }
+    }
+
+    private fun setUserAdapter() {
+        if(userAdaper != null){
+            userAdaper?.updateList(userDataList)
+            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
+        }
+        else {
+            userAdaper = UsersAdapter(userDataList)
+            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
+        }
+    }
+
+    private fun getAllGroupTransactions() {
         try {
             db.collection("GroupData").document(groupId)
                 .get().addOnSuccessListener { it ->
