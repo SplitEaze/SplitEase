@@ -1,22 +1,22 @@
 package com.example.splitease.ui.DetailedGroup
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.splitease.Models.TransactionsModel
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
+import com.example.splitease.ui.AddUpdateTransaction.AddTransaction
 import com.example.splitease.ui.DetailedGroup.Adapter.TransactionsAdapter
 import com.example.splitease.ui.DetailedGroup.Adapter.UsersAdapter
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
+import com.example.splitease.ui.AddUpdateTransaction.EditTransaction
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import java.lang.Exception
 
-class DetailedGroup : AppCompatActivity() {
+class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener {
 
     private var userDataList: MutableList<UserDataModel> = ArrayList()
     private lateinit var userItemModel: MutableList<UserDataModel>
@@ -25,8 +25,6 @@ class DetailedGroup : AppCompatActivity() {
     val db = FirebaseFirestore.getInstance()
     var userAdaper: UsersAdapter?= null
     var transactionAdapter: TransactionsAdapter ?= null
-    private lateinit var user: FirebaseUser
-    private lateinit var auth: FirebaseAuth
     private var groupId = ""
     private var transactionIds = ArrayList<Any>()
     private var userIds = ArrayList<Any>()
@@ -43,6 +41,12 @@ class DetailedGroup : AppCompatActivity() {
 
         getGroupUsers()
         getAllGroupTransactions()
+
+        findViewById<Button>(R.id.addExpenseBtn).setOnClickListener {
+            val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
+            intent.putExtra("groupId", groupId)
+            startActivity(intent)
+        }
     }
 
     private fun getGroupUsers() {
@@ -63,17 +67,6 @@ class DetailedGroup : AppCompatActivity() {
         }
         catch (e: Exception){
             System.err.print("Some Error Occurred")
-        }
-    }
-
-    private fun setUserAdapter() {
-        if(userAdaper != null){
-            userAdaper?.updateList(userDataList)
-            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
-        }
-        else {
-            userAdaper = UsersAdapter(userDataList)
-            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
         }
     }
 
@@ -104,8 +97,25 @@ class DetailedGroup : AppCompatActivity() {
             findViewById<RecyclerView>(R.id.rvTransactions)?.adapter = transactionAdapter
         }
         else {
-            transactionAdapter = TransactionsAdapter(transactionItemModel)
+            transactionAdapter = TransactionsAdapter(transactionItemModel, this)
             findViewById<RecyclerView>(R.id.rvTransactions)?.adapter = transactionAdapter
         }
+    }
+
+    private fun setUserAdapter() {
+        if(userAdaper != null){
+            userAdaper?.updateList(userDataList)
+            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
+        }
+        else {
+            userAdaper = UsersAdapter(userDataList)
+            findViewById<RecyclerView>(R.id.rvUsers)?.adapter = userAdaper
+        }
+    }
+
+    override fun onItemClick(position: Int) {
+        val intent = Intent(this@DetailedGroup, EditTransaction::class.java)
+        intent.putExtra("trnId", transactionDataList[position].trn_id)
+        startActivity(intent)
     }
 }

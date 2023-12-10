@@ -85,6 +85,10 @@ class Signup : AppCompatActivity() {
                             db.collection("UserData").document(user.uid)
                                 .collection("users").document(user.uid).set(userData)
 
+                            //Create groups collection
+                            db.collection("UserData").document(user.uid)
+                                .collection("groups")
+
                             SharedPref(this@Signup).setString(Constants.UUID, user.uid)
                             SharedPref(this@Signup).setString(Constants.NAME, name.text.toString())
 

@@ -14,8 +14,8 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     private lateinit var context: Context
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val groupHead = itemView.findViewById<TextView>(R.id.groupHead)
-        val totalSpends = itemView.findViewById<TextView>(R.id.totalSpends)
+        val userName = itemView.findViewById<TextView>(R.id.userName)
+        val userBal = itemView.findViewById<TextView>(R.id.userBal)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,8 +26,8 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.groupHead.text = userItemModel[position].grp_name
-        holder.totalSpends.text = userItemModel[position].grp_total.toString()
+        holder.userName.text = userItemModel[position].user_name
+        holder.userBal.text = userItemModel[position].user_bal.toString()
     }
 
     override fun getItemCount(): Int {

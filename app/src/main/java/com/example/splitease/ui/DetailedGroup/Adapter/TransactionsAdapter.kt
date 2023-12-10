@@ -9,14 +9,14 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.splitease.Models.TransactionsModel
 import com.example.splitease.R
+import com.example.splitease.ui.Groups.Adapter.GroupsAdapter
 
-class TransactionsAdapter (var transactionItemModel: MutableList<TransactionsModel>)
+class TransactionsAdapter (var transactionItemModel: MutableList<TransactionsModel>, var mClickListener: ItemClickListener)
     : RecyclerView.Adapter<TransactionsAdapter.ViewHolder>() {
     private lateinit var context: Context
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val trnAmt = itemView.findViewById<TextView>(R.id.trnAmt)
-        val totalSpends = itemView.findViewById<TextView>(R.id.totalSpends)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,9 +27,10 @@ class TransactionsAdapter (var transactionItemModel: MutableList<TransactionsMod
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        Log.d("hereiam", "getTransactionsIds: "+transactionItemModel[position].trn_amt)
         holder.trnAmt.text = transactionItemModel[position].trn_amt.toString()
-//        holder.totalSpends.text = transactionItemModel[position].grp_total.toString()
+        holder.itemView.setOnClickListener {
+            mClickListener.onItemClick(position)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -39,5 +40,9 @@ class TransactionsAdapter (var transactionItemModel: MutableList<TransactionsMod
     fun updateList(temp: MutableList<TransactionsModel>) {
         transactionItemModel = temp
         notifyDataSetChanged()
+    }
+
+    interface ItemClickListener{
+        fun onItemClick(position: Int)
     }
 }
