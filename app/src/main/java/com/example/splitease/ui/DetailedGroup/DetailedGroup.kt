@@ -3,6 +3,7 @@ package com.example.splitease.ui.DetailedGroup
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -36,9 +37,9 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
         val bundle = intent.extras
         groupId = bundle?.getString("groupId").toString()
 
+        setGroupDetails(groupId)
         findViewById<RecyclerView>(R.id.rvUsers)?.layoutManager = LinearLayoutManager(this)
         findViewById<RecyclerView>(R.id.rvTransactions)?.layoutManager = LinearLayoutManager(this)
-
         getGroupUsers()
         getAllGroupTransactions()
 
@@ -46,6 +47,20 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
             val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
             intent.putExtra("groupId", groupId)
             startActivity(intent)
+        }
+    }
+
+    private fun setGroupDetails(groupId: String) {
+
+        try {
+            db.collection("GroupData").document(groupId)
+                .get().addOnSuccessListener {
+                    findViewById<TextView>(R.id.heading).text = it.get("grp_name").toString()
+                    findViewById<TextView>(R.id.totalOwedMoney).text = it.get("grp_total").toString()
+                }
+        }
+        catch (e: Exception){
+            System.err.print("Some Error Occurred")
         }
     }
 
