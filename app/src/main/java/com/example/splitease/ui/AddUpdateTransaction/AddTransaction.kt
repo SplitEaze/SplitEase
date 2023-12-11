@@ -1,5 +1,6 @@
 package com.example.splitease.ui.AddUpdateTransaction
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -8,8 +9,11 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.example.splitease.R
+import com.example.splitease.ui.DetailedGroup.DetailedGroup
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -28,6 +32,7 @@ class AddTransaction : AppCompatActivity(){
     private var users = ArrayList<Any>()
     private var userNameArray = ArrayList<Any>()
     private var user_name : Any? = null
+    private var user_id : Any? = null
     private var selectedUser = ""
     private var userIds = ArrayList<Any>()
     private var numberOfBorrowers = 0
@@ -45,6 +50,7 @@ class AddTransaction : AppCompatActivity(){
         selectLenderUser()
 
         findViewById<Button>(R.id.saveTrnBtn).setOnClickListener {
+            Log.i("selectedUser", "onCreate: $selectedUser")
             if (desc.text.isNullOrEmpty()){
                 desc.error = "Enter the description"
             } else if (amt.text.isNullOrEmpty()){
@@ -81,7 +87,6 @@ class AddTransaction : AppCompatActivity(){
 
                 //Add transaction to the borrower user
                 addTransactionToBorrowerUser(borrowers, amt)
-
                 finish()
             }
         }
@@ -97,8 +102,8 @@ class AddTransaction : AppCompatActivity(){
                     .get().addOnSuccessListener { it ->
                         var Balance = it.get("user_bal")
                         //If Split is equal
-                        Balance = (Balance.toString().toFloat() + (amt?.text.toString()
-                            .toFloat() / (numberOfBorrowers + 1)))
+                        Balance = (Balance.toString().toDouble() + (amt?.text.toString().toDouble() / (numberOfBorrowers + 1)))
+                        Balance = Math.round(Balance*100.0)/100.0
                         db.collection("UserData").document(borrower.toString())
                             .collection("users").document(borrower.toString())
                             .update("user_bal", Balance)
@@ -123,7 +128,8 @@ class AddTransaction : AppCompatActivity(){
                     var Balance = it.get("user_bal")
                     //If Split is equal
 
-                    Balance = (Balance.toString().toFloat() - ((amt.text.toString().toFloat())*numberOfBorrowers)/(numberOfBorrowers+1))
+                    Balance = (Balance.toString().toDouble() - ((amt.text.toString().toDouble())*numberOfBorrowers)/(numberOfBorrowers+1))
+                    Balance = Math.round(Balance*100.0)/100.0
                     db.collection("UserData").document(selectedUser)
                         .collection("users").document(selectedUser)
                         .update("user_bal", Balance)
@@ -141,13 +147,14 @@ class AddTransaction : AppCompatActivity(){
                 .get().addOnSuccessListener { it ->
                     users = (it.get("grp_users") as ArrayList<Any>)
                     for (uId in users){
-                        userIds.add(uId)
                         db.collection("UserData").document(uId.toString())
                             .collection("users")
                             .document(uId.toString())
                             .get().addOnSuccessListener{
                                 user_name = it.data?.get("user_name")
+                                user_id = it.data?.get("user_id")
                                 userNameArray.add(user_name.toString())
+                                userIds.add(user_id.toString())
                                 ArrayAdapter(this@AddTransaction, android.R.layout.simple_spinner_item, userNameArray)
                                     .also {adapter ->
                                         // Specify the layout to use when the list of choices appears.
@@ -162,7 +169,7 @@ class AddTransaction : AppCompatActivity(){
                                                 p3: Long
                                             ) {
                                                 //This variable contains the UID of the selected user
-                                                selectedUser = users[position].toString()
+                                                selectedUser = userIds[position].toString()
                                             }
 
                                             override fun onNothingSelected(p0: AdapterView<*>?) {
@@ -190,7 +197,8 @@ class AddTransaction : AppCompatActivity(){
 
                     //Update the balance to the group
                     var grpBalance = it.get("grp_total")
-                    grpBalance = (grpBalance.toString().toFloat() + amt.text.toString().toFloat())
+                    grpBalance = (grpBalance.toString().toDouble() + amt.text.toString().toDouble())
+                    grpBalance = Math.round(grpBalance*100.0)/100.0
                     db.collection("GroupData").document(groupId)
                         .update("grp_total", grpBalance)
                 }
