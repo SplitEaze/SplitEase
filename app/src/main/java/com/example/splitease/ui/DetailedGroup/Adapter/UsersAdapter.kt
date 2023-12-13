@@ -8,13 +8,13 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
+import kotlin.math.abs
 
 class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     : RecyclerView.Adapter<UsersAdapter.ViewHolder>() {
     private lateinit var context: Context
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
-        val userName = itemView.findViewById<TextView>(R.id.userName)
         val userBal = itemView.findViewById<TextView>(R.id.userBal)
     }
 
@@ -26,8 +26,13 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.userName.text = userItemModel[position].user_name
-        holder.userBal.text = userItemModel[position].user_bal.toString()
+        if (userItemModel[position].user_bal.toString().toFloat() < 0.0){
+            holder.userBal.text = "${userItemModel[position].user_name}. is owed ₹${abs(userItemModel[position].user_bal)} overall"
+        } else if (userItemModel[position].user_bal.toString().toDouble() == 0.0){
+            holder.userBal.visibility = View.GONE
+        } else {
+            holder.userBal.text = "${userItemModel[position].user_name}. owes you ₹${abs(userItemModel[position].user_bal)}"
+        }
     }
 
     override fun getItemCount(): Int {

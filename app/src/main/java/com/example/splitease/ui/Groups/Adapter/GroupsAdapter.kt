@@ -15,7 +15,6 @@ class GroupsAdapter(var userItemModel: MutableList<UserDataModel>, var mClickLis
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         val groupHead = itemView.findViewById<TextView>(R.id.groupHead)
-        val totalSpends = itemView.findViewById<TextView>(R.id.totalSpends)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,7 +26,6 @@ class GroupsAdapter(var userItemModel: MutableList<UserDataModel>, var mClickLis
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.groupHead.text = userItemModel[position].grp_name
-        holder.totalSpends.text = userItemModel[position].grp_total.toString()
 
         holder.itemView.setOnClickListener {
             mClickListener.onItemClick(position)

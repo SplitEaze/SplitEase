@@ -9,9 +9,11 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.splitease.R
 import com.example.splitease.ui.DetailedGroup.DetailedGroup
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +42,16 @@ class AddTransaction : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_transaction)
+        WindowCompat.setDecorFitsSystemWindows(window, false)      //Make UI Full Screen
+        val windowInsetsController =
+            ViewCompat.getWindowInsetsController(window.decorView)
+
+        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())      // Hide the system bars.
+
+        windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())      // Show the system bars.
+        windowInsetsController?.isAppearanceLightNavigationBars = true
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO) //remove night mode
+        supportActionBar?.hide()
         auth = Firebase.auth
 
         val desc = findViewById<EditText>(R.id.Desc)
@@ -65,16 +77,17 @@ class AddTransaction : AppCompatActivity(){
 
                 val trnData = HashMap<String, Any>()
 
+                //Create the document to get the Transaction ID
+                val newTransactionRef = db.collection("TransactionData").document()
+
                 trnData["trn_desc"] = desc.text.toString()
                 trnData["trn_amt"] = amt.text.toString().toDouble()
                 trnData["trn_date"] = Date()
                 trnData["lender"] = selectedUser
                 trnData["borrowers"] = borrowers
+                trnData["trn_id"] = newTransactionRef.id
 
-                //Create the document to get the Transaction ID
-                val newTransactionRef = db.collection("TransactionData").document()
-
-                //Add transaction to the TransactionData
+                        //Add transaction to the TransactionData
                 newTransactionRef.collection("trns")
                     .document(newTransactionRef.id)
                     .set(trnData)
@@ -83,23 +96,32 @@ class AddTransaction : AppCompatActivity(){
                 addTransactionToGroup(newTransactionRef.id, amt)
 
                 //Add transaction to the lender user
-                addTransactionToLenderUser(selectedUser, borrowers, amt)
+                addTransactionToLenderUser(newTransactionRef.id, selectedUser, borrowers, amt)
 
                 //Add transaction to the borrower user
-                addTransactionToBorrowerUser(borrowers, amt)
+                addTransactionToBorrowerUser(newTransactionRef.id, borrowers, amt)
                 finish()
             }
         }
     }
 
-    private fun addTransactionToBorrowerUser(borrowers: ArrayList<Any>, amt: EditText?) {
+    private fun addTransactionToBorrowerUser(
+        id: String,
+        borrowers: ArrayList<Any>,
+        amt: EditText?
+    ) {
         //Splitting the amount equally
-
         try {
             for (borrower in borrowers) {
                 db.collection("UserData").document(borrower.toString())
                     .collection("users").document(borrower.toString())
                     .get().addOnSuccessListener { it ->
+                        transactionIds = (it.get("user_trn") as ArrayList<Any>)
+                        transactionIds.add(id)
+                        db.collection("UserData").document(borrower.toString())
+                            .collection("users").document(borrower.toString())
+                            .update("user_trn", transactionIds)
+
                         var Balance = it.get("user_bal")
                         //If Split is equal
                         Balance = (Balance.toString().toDouble() + (amt?.text.toString().toDouble() / (numberOfBorrowers + 1)))
@@ -116,6 +138,7 @@ class AddTransaction : AppCompatActivity(){
     }
 
     private fun addTransactionToLenderUser(
+        id: String,
         selectedUser: String,
         borrowers: ArrayList<Any>,
         amt: EditText
@@ -125,9 +148,14 @@ class AddTransaction : AppCompatActivity(){
             db.collection("UserData").document(selectedUser)
                 .collection("users").document(selectedUser)
                 .get().addOnSuccessListener { it ->
+                    transactionIds = (it.get("user_trn") as ArrayList<Any>)
+                    transactionIds.add(id)
+                    db.collection("UserData").document(selectedUser)
+                        .collection("users").document(selectedUser)
+                    .update("user_trn", transactionIds)
+
                     var Balance = it.get("user_bal")
                     //If Split is equal
-
                     Balance = (Balance.toString().toDouble() - ((amt.text.toString().toDouble())*numberOfBorrowers)/(numberOfBorrowers+1))
                     Balance = Math.round(Balance*100.0)/100.0
                     db.collection("UserData").document(selectedUser)

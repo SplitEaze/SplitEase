@@ -44,6 +44,7 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         view?.findViewById<RecyclerView>(R.id.rvGroups)?.layoutManager = LinearLayoutManager(context)
+        getGroups()
         view?.findViewById<Button>(R.id.createGroupBtn)?.setOnClickListener {
             auth = Firebase.auth
             user = auth.currentUser!!
@@ -54,7 +55,6 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
             intent.putExtra("grpId", groupId)
             startActivity(intent)
         }
-        getGroups()
     }
 
     private fun getGroups() {
@@ -74,14 +74,8 @@ class GroupsFragment : Fragment(), GroupsAdapter.ItemClickListener {
     }
 
     private fun setAdapter() {
-        if(userAdaper != null){
-            userAdaper?.updateList(documentDataList)
-            view?.findViewById<RecyclerView>(R.id.rvGroups)?.adapter = userAdaper
-        }
-        else {
             userAdaper = GroupsAdapter(userItemModel, this)
             view?.findViewById<RecyclerView>(R.id.rvGroups)?.adapter = userAdaper
-        }
     }
 
     override fun onItemClick(position: Int) {

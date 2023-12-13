@@ -14,8 +14,10 @@
     <color name="offwhite">#EFEEEE</color>
     <color name="blue">#3572CD</color>
     <color name="green">#00C853</color>
-    <color name="light_grey">#EDEDED</color>
+    <color name="light_grey">#979696</color>
     <color name="yellow">#D6730A</color>
     <color name="dark_violet">#413B4C</color>
     <color name="overlay_black">#26000000</color>
+    <color name="primary_grey">#202020</color>
+    <color name="red">#FF0000</color>
 </resources>
