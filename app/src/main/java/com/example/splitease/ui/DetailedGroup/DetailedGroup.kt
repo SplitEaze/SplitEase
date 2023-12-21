@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -56,14 +57,15 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
         val bundle = intent.extras
         groupId = bundle?.getString("groupId").toString()
         setGroupDetails(groupId)
-        findViewById<RecyclerView>(R.id.rvUsers)?.layoutManager = LinearLayoutManager(this)
-        findViewById<RecyclerView>(R.id.rvTransactions)?.layoutManager = LinearLayoutManager(this)
+        findViewById<RecyclerView>(R.id.rvUsers)?.layoutManager = LinearLayoutManager(this@DetailedGroup)
+        findViewById<RecyclerView>(R.id.rvTransactions)?.layoutManager = LinearLayoutManager(this@DetailedGroup)
         getGroupUsers()
         getAllGroupTransactions()
 
         findViewById<Button>(R.id.addExpenseBtn).setOnClickListener {
             val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
             intent.putExtra("groupId", groupId)
+            intent.putExtra("mode", "add")
             startActivity(intent)
         }
     }
@@ -153,16 +155,17 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
     }
 
     override fun onItemClick(position: Int) {
-        findViewById<ImageButton>(R.id.editTrn).visibility = View.VISIBLE
-        findViewById<ImageButton>(R.id.deleteTrn).visibility = View.VISIBLE
 
         findViewById<ImageButton>(R.id.deleteTrn)?.setOnClickListener {
             showDialogBox(transactionDataList[position])
         }
 
         findViewById<ImageButton>(R.id.editTrn)?.setOnClickListener {
-            val intent = Intent(this@DetailedGroup, EditTransaction::class.java)
+            val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
             intent.putExtra("trnId", transactionDataList[position].trn_id)
+            intent.putExtra("groupId", groupId)
+            intent.putExtra("mode", "edit")
+//            intent.putParcelableArrayListExtra("old", transactionDataList[position])
             startActivity(intent)
         }
     }

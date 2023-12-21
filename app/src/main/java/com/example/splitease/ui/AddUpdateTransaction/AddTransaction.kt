@@ -30,6 +30,8 @@ class AddTransaction : AppCompatActivity(){
     private lateinit var user: FirebaseUser
     val db = Firebase.firestore
     private var groupId = ""
+    private var mode = ""
+    private var trnId = ""
     private var transactionIds = ArrayList<Any>()
     private var users = ArrayList<Any>()
     private var userNameArray = ArrayList<Any>()
@@ -57,7 +59,11 @@ class AddTransaction : AppCompatActivity(){
         val desc = findViewById<EditText>(R.id.Desc)
         val amt = findViewById<EditText>(R.id.Amt)
         val bundle = intent.extras
+
         groupId = bundle?.getString("groupId").toString()
+        trnId = bundle?.getString("trnId").toString()
+        mode = bundle?.getString("mode").toString()
+
         //Add transaction to the user
         selectLenderUser()
 
@@ -74,34 +80,91 @@ class AddTransaction : AppCompatActivity(){
                 val borrowers = arrayListOf<Any>()
                 userIds.filterTo(borrowers) { it != selectedUser }
 
+                //Add transaction to the TransactionData
+                if (mode == "add"){
+                    val trnData = HashMap<String, Any>()
 
-                val trnData = HashMap<String, Any>()
+                    //Create the document to get the Transaction ID
+                    val newTransactionRef = db.collection("TransactionData").document()
 
-                //Create the document to get the Transaction ID
-                val newTransactionRef = db.collection("TransactionData").document()
+                    trnData["trn_desc"] = desc.text.toString()
+                    trnData["trn_amt"] = amt.text.toString().toDouble()
+                    trnData["trn_date"] = Date()
+                    trnData["lender"] = selectedUser
+                    trnData["borrowers"] = borrowers
+                    trnData["trn_id"] = newTransactionRef.id
 
-                trnData["trn_desc"] = desc.text.toString()
-                trnData["trn_amt"] = amt.text.toString().toDouble()
-                trnData["trn_date"] = Date()
-                trnData["lender"] = selectedUser
-                trnData["borrowers"] = borrowers
-                trnData["trn_id"] = newTransactionRef.id
+                    newTransactionRef.collection("trns")
+                        .document(newTransactionRef.id)
+                        .set(trnData)
 
-                        //Add transaction to the TransactionData
-                newTransactionRef.collection("trns")
-                    .document(newTransactionRef.id)
-                    .set(trnData)
+                    //Add transaction to the group
+                    addTransactionToGroup(newTransactionRef.id, amt)
 
-                //Add transaction to the group
-                addTransactionToGroup(newTransactionRef.id, amt)
+                    //Add transaction to the lender user
+                    addTransactionToLenderUser(newTransactionRef.id, selectedUser, borrowers, amt)
 
-                //Add transaction to the lender user
-                addTransactionToLenderUser(newTransactionRef.id, selectedUser, borrowers, amt)
+                    //Add transaction to the borrower user
+                    addTransactionToBorrowerUser(newTransactionRef.id, borrowers, amt)
 
-                //Add transaction to the borrower user
-                addTransactionToBorrowerUser(newTransactionRef.id, borrowers, amt)
+                } else if (mode == "edit"){
+
+                    val trnData = HashMap<String, Any>()
+
+                    trnData["trn_desc"] = desc.text.toString()
+                    trnData["trn_amt"] = amt.text.toString().toDouble()
+                    trnData["trn_date"] = Date()
+                    trnData["lender"] = selectedUser
+                    trnData["borrowers"] = borrowers
+                    trnData["trn_id"] = trnId
+
+                    db.collection("TransactionData").document(trnId)
+                        .collection("trns")
+                        .document(trnId)
+                        .set(trnData)
+
+                    //Edit transaction to the group
+                    editTransactionToGroup(trnId, amt)
+
+                    //Edit transaction to the lender user
+                    editTransactionToLenderUser(trnId, selectedUser, borrowers, amt)
+
+                    //Edit transaction to the borrower user
+                    editTransactionToBorrowerUser(trnId, borrowers, amt)
+                }
+
                 finish()
             }
+        }
+    }
+
+    private fun editTransactionToBorrowerUser(id: Any, borrowers: java.util.ArrayList<Any>, amt: EditText?) {
+
+    }
+
+    private fun editTransactionToLenderUser(
+        id: Any,
+        selectedUser: String,
+        borrowers: java.util.ArrayList<Any>,
+        amt: EditText?
+    ) {
+
+    }
+
+    private fun editTransactionToGroup(id: Any, amt: EditText?) {
+        try {
+            db.collection("GroupData").document(groupId)
+                .get().addOnSuccessListener { it ->
+                    //Update the balance to the group
+                    var grpBalance = it.get("grp_total")
+                    grpBalance = (grpBalance.toString().toDouble() + amt?.text.toString().toDouble())
+                    grpBalance = Math.round(grpBalance*100.0)/100.0
+                    db.collection("GroupData").document(groupId)
+                        .update("grp_total", grpBalance)
+                }
+        }
+        catch (e: Exception){
+            System.err.print("Some Error Occurred")
         }
     }
 
