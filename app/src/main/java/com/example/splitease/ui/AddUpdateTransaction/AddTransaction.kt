@@ -16,6 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.splitease.R
 import com.example.splitease.ui.DetailedGroup.DetailedGroup
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
@@ -40,7 +41,10 @@ class AddTransaction : AppCompatActivity(){
     private var selectedUser = ""
     private var userIds = ArrayList<Any>()
     private var numberOfBorrowers = 0
-
+    private var oldAmt = 0.0
+    private var oldLender = ""
+    private var oldDesc = ""
+    private var oldBorrowers = ArrayList<String>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_transaction)
@@ -59,10 +63,19 @@ class AddTransaction : AppCompatActivity(){
         val desc = findViewById<EditText>(R.id.Desc)
         val amt = findViewById<EditText>(R.id.Amt)
         val bundle = intent.extras
-
         groupId = bundle?.getString("groupId").toString()
-        trnId = bundle?.getString("trnId").toString()
         mode = bundle?.getString("mode").toString()
+
+        if (mode == "edit"){
+            oldDesc = bundle?.getString("oldDesc").toString()
+            trnId = bundle?.getString("trnId").toString()
+            oldAmt = bundle?.getDouble("oldAmt")!!
+            oldLender = bundle.getString("oldLender").toString()
+            oldBorrowers = bundle.getStringArrayList("oldBorrowers")!!
+
+            findViewById<TextInputEditText>(R.id.Amt).setText(oldAmt.toString())
+            findViewById<TextInputEditText>(R.id.Desc).setText(oldDesc)
+        }
 
         //Add transaction to the user
         selectLenderUser()
@@ -75,7 +88,6 @@ class AddTransaction : AppCompatActivity(){
                 amt.error = "Enter the amount"
             } else{
                 //Add transaction to transactionData, Particular user's and group total
-
                 //Get only the borrowers list
                 val borrowers = arrayListOf<Any>()
                 userIds.filterTo(borrowers) { it != selectedUser }
@@ -108,7 +120,6 @@ class AddTransaction : AppCompatActivity(){
                     addTransactionToBorrowerUser(newTransactionRef.id, borrowers, amt)
 
                 } else if (mode == "edit"){
-
                     val trnData = HashMap<String, Any>()
 
                     trnData["trn_desc"] = desc.text.toString()
@@ -124,7 +135,7 @@ class AddTransaction : AppCompatActivity(){
                         .set(trnData)
 
                     //Edit transaction to the group
-                    editTransactionToGroup(trnId, amt)
+                    editTransactionToGroup(amt)
 
                     //Edit transaction to the lender user
                     editTransactionToLenderUser(trnId, selectedUser, borrowers, amt)
@@ -139,25 +150,81 @@ class AddTransaction : AppCompatActivity(){
     }
 
     private fun editTransactionToBorrowerUser(id: Any, borrowers: java.util.ArrayList<Any>, amt: EditText?) {
+        try {
+            for (borrower in borrowers) {
+                db.collection("UserData").document(borrower.toString())
+                    .collection("users").document(borrower.toString())
+                    .get().addOnSuccessListener { it ->
+                        var Balance = it.get("user_bal")
+                        //If Split is equal
 
+                        //If old lender is now the borrower
+                        if (borrower == oldLender){
+                            Balance = ((Balance.toString().toDouble() + ((oldAmt * oldBorrowers.count()) / (oldBorrowers.count() + 1)))
+                                    + (amt?.text.toString().toDouble() / (numberOfBorrowers + 1)))
+                        }
+                        //If old borrower is again the borrower
+                        else if (borrower in oldBorrowers){
+                            Balance = ((Balance.toString().toDouble() - (oldAmt / (oldBorrowers.count() + 1)))
+                                    + (amt?.text.toString().toDouble() / (numberOfBorrowers + 1)))
+                        }
+
+                        Balance = Math.round(Balance.toString().toDouble()*100.0)/100.0
+                        db.collection("UserData").document(borrower.toString())
+                            .collection("users").document(borrower.toString())
+                            .update("user_bal", Balance)
+                    }
+            }
+        }
+        catch (e: Exception){
+            System.err.print("Some Error Occurred")
+        }
     }
 
     private fun editTransactionToLenderUser(
-        id: Any,
+        trnId: Any,
         selectedUser: String,
         borrowers: java.util.ArrayList<Any>,
         amt: EditText?
     ) {
+        try {
+            numberOfBorrowers = borrowers.count()
+            db.collection("UserData").document(selectedUser)
+                .collection("users").document(selectedUser)
+                .get().addOnSuccessListener { it ->
+                    var Balance = it.get("user_bal")
+                    //Update Balance
 
+                    //if old lender is again the lender
+                    if (selectedUser == oldLender) {
+                        Balance = ((Balance.toString()
+                            .toDouble() + ((oldAmt * numberOfBorrowers) / (numberOfBorrowers + 1))) - ((amt?.text.toString()
+                            .toDouble()) * numberOfBorrowers) / (numberOfBorrowers + 1))
+                    }
+                    //If old borrower is the new lender
+                    else if (selectedUser in oldBorrowers){
+                        Balance = ((Balance.toString()
+                            .toDouble() - (oldAmt / (oldBorrowers.count() + 1))) - ((amt?.text.toString()
+                            .toDouble()) * numberOfBorrowers) / (numberOfBorrowers + 1))
+                    }
+                    Balance = Math.round(Balance.toString().toDouble()*100.0)/100.0
+                    db.collection("UserData").document(selectedUser)
+                        .collection("users").document(selectedUser)
+                        .update("user_bal", Balance)
+                }
+        }
+        catch (e: Exception){
+            System.err.print("Some Error Occurred")
+        }
     }
 
-    private fun editTransactionToGroup(id: Any, amt: EditText?) {
+    private fun editTransactionToGroup(amt: EditText?) {
         try {
             db.collection("GroupData").document(groupId)
                 .get().addOnSuccessListener { it ->
                     //Update the balance to the group
                     var grpBalance = it.get("grp_total")
-                    grpBalance = (grpBalance.toString().toDouble() + amt?.text.toString().toDouble())
+                    grpBalance = ((grpBalance.toString().toDouble() - oldAmt) + amt?.text.toString().toDouble())
                     grpBalance = Math.round(grpBalance*100.0)/100.0
                     db.collection("GroupData").document(groupId)
                         .update("grp_total", grpBalance)

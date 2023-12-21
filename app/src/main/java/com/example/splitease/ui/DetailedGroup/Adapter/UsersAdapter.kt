@@ -26,13 +26,14 @@ class UsersAdapter (var userItemModel: MutableList<UserDataModel>)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (userItemModel[position].user_bal.toString().toFloat() < 0.0){
-            holder.userBal.text = "${userItemModel[position].user_name}. is owed ₹${abs(userItemModel[position].user_bal)} overall"
-        } else if (userItemModel[position].user_bal.toString().toDouble() == 0.0){
-            holder.userBal.visibility = View.GONE
-        } else {
-            holder.userBal.text = "${userItemModel[position].user_name}. owes you ₹${abs(userItemModel[position].user_bal)}"
-        }
+        holder.userBal.text = "${userItemModel[position].user_name} : ₹${userItemModel[position].user_bal} overall"
+//        if (userItemModel[position].user_bal.toString().toFloat() < 0.0){
+//            holder.userBal.text = "${userItemModel[position].user_name}. is owed ₹${abs(userItemModel[position].user_bal)} overall"
+//        } else if (userItemModel[position].user_bal.toString().toDouble() == 0.0){
+//            holder.userBal.visibility = View.GONE
+//        } else {
+//            holder.userBal.text = "${userItemModel[position].user_name}. owes you ₹${abs(userItemModel[position].user_bal)}"
+//        }
     }
 
     override fun getItemCount(): Int {

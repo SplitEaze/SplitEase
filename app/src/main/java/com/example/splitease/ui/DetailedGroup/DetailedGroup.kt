@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -164,8 +165,11 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
             val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
             intent.putExtra("trnId", transactionDataList[position].trn_id)
             intent.putExtra("groupId", groupId)
+            intent.putExtra("oldAmt", transactionDataList[position].trn_amt)
+            intent.putExtra("oldLender", transactionDataList[position].lender)
+            intent.putExtra("oldBorrowers", transactionDataList[position].borrowers)
+            intent.putExtra("oldDesc", transactionDataList[position].trn_desc)
             intent.putExtra("mode", "edit")
-//            intent.putParcelableArrayListExtra("old", transactionDataList[position])
             startActivity(intent)
         }
     }
@@ -182,7 +186,7 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
                 db.collection("TransactionData").document(trn.trn_id)
                     .delete()
 
-                //Delete transaction from the users
+                //Delete transaction from lender
                 db.collection("UserData").document(trn.lender)
                     .collection("users").document(trn.lender)
                     .get().addOnSuccessListener { it ->

@@ -4,7 +4,7 @@ import java.util.Date
 
 class TransactionsModel() {
     val trn_id = ""
-    val trn_cat = ""
+    val trn_desc = ""
     val borrowers = arrayListOf<String>()
     val lender = ""
     val split_by = ""
