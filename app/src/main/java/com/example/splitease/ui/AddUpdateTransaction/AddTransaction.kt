@@ -28,7 +28,6 @@ import java.util.Date
 class AddTransaction : AppCompatActivity(){
 
     private lateinit var auth: FirebaseAuth
-    private lateinit var user: FirebaseUser
     val db = Firebase.firestore
     private var groupId = ""
     private var mode = ""

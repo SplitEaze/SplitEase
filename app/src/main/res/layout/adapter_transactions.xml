@@ -12,20 +12,27 @@
 
 <!--        Date and Image-->
         <LinearLayout
-            android:layout_weight="1"
+            android:layout_weight="0.7"
             android:orientation="horizontal"
             android:layout_width="0dp"
+            android:layout_marginStart="10dp"
             android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
-
+<!--                image-->
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/trnDate"
+                    android:textColor="@color/white"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
 
             </LinearLayout>
 
@@ -47,7 +54,7 @@
                     android:textColor="@color/white"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="HOTEL"/>
+                    android:textSize="@dimen/_11sdp" />
 
             </LinearLayout>
 
@@ -57,20 +64,12 @@
 
                 <TextView
                     android:id="@+id/trnAmt"
+                    android:textSize="@dimen/_8sdp"
                     android:textColor="@color/white"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="paid 1200"/>
+                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
-
-        </LinearLayout>
-
-<!--    amount and status-->
-        <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content">
 
         </LinearLayout>
 

@@ -28,8 +28,7 @@
             android:exported="true"/>
         <activity android:name=".ui.DetailedGroup.DetailedGroup"
             android:exported="true"/>
-        <activity android:name=".ui.AddUpdateTransaction.EditTransaction"
-            android:exported="true"/>
+
         <activity android:name=".ui.AddUpdateTransaction.AddTransaction"
             android:exported="true"/>
 
