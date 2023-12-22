@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.ImageButton
@@ -21,8 +22,11 @@ import com.example.splitease.R
 import com.example.splitease.ui.AddUpdateTransaction.AddTransaction
 import com.example.splitease.ui.DetailedGroup.Adapter.TransactionsAdapter
 import com.example.splitease.ui.DetailedGroup.Adapter.UsersAdapter
+import com.example.splitease.ui.Login.Login
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import java.lang.Exception
+import java.util.Date
 
 class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener {
 
@@ -112,15 +116,17 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
                         findViewById<TextView>(R.id.noExTv).visibility = View.VISIBLE
                         findViewById<RecyclerView>(R.id.rvTransactions).visibility = View.GONE
                     }
-
-                    for (tid in transactionIds){
-                        db.collection("TransactionData").document(tid.toString())
-                            .collection("trns")
-                            .get().addOnSuccessListener {
-                                transactionItemModel = it.toObjects(TransactionsModel::class.java)
-                                transactionDataList.addAll(transactionItemModel)
-                                setTransactionAdapter()
-                            }
+                    else {
+                        transactionIds.reverse()
+                        for (tid in transactionIds){
+                            db.collection("TransactionData").document(tid.toString())
+                                .collection("trns")
+                                .get().addOnSuccessListener {
+                                    transactionItemModel = it.toObjects(TransactionsModel::class.java)
+                                    transactionDataList.addAll(transactionItemModel)
+                                    setTransactionAdapter()
+                                }
+                        }
                     }
                 }
         }
@@ -153,98 +159,5 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
 
     override fun onItemClick(position: Int) {
 
-//        findViewById<ImageButton>(R.id.deleteTrn)?.setOnClickListener {
-////            showDialogBox(transactionDataList[position])
-//        }
-
-        findViewById<ImageButton>(R.id.editTrn)?.setOnClickListener {
-            val intent = Intent(this@DetailedGroup, AddTransaction::class.java)
-            intent.putExtra("trnId", transactionDataList[position].trn_id)
-            intent.putExtra("groupId", groupId)
-            intent.putExtra("oldAmt", transactionDataList[position].trn_amt)
-            intent.putExtra("oldLender", transactionDataList[position].lender)
-            intent.putExtra("oldBorrowers", transactionDataList[position].borrowers)
-            intent.putExtra("oldDesc", transactionDataList[position].trn_desc)
-            intent.putExtra("mode", "edit")
-            startActivity(intent)
-        }
     }
-
-//    private fun showDialogBox(trn: TransactionsModel) {
-//        val builder = AlertDialog.Builder(this@DetailedGroup)
-//        builder.setTitle("Delete")
-//        builder.setMessage("Are you sure you want to delete this transaction?")
-//        builder.setPositiveButton("Yes"){
-//            dialog: DialogInterface?, which: Int ->
-//
-//            try {
-//                //Delete transaction from the transactions db
-//                db.collection("TransactionData").document(trn.trn_id)
-//                    .delete()
-//
-//                //Delete transaction from lender
-//                db.collection("UserData").document(trn.lender)
-//                    .collection("users").document(trn.lender)
-//                    .get().addOnSuccessListener { it ->
-//                        transactionIds = (it.get("user_trn") as ArrayList<Any>)
-//                        transactionIds.remove(trn.trn_id)
-//                        db.collection("UserData").document(trn.lender)
-//                            .collection("users").document(trn.lender)
-//                            .update("user_trn", transactionIds)
-//                        var Balance = it.get("user_bal")
-//                        //If Split is equal
-//                        Balance = (Balance.toString().toDouble() + ((trn.trn_amt)*trn.borrowers.count())/(trn.borrowers.count()+1))
-//                        Balance = Math.round(Balance*100.0)/100.0
-//                        db.collection("UserData").document(trn.lender)
-//                            .collection("users").document(trn.lender)
-//                            .update("user_bal", Balance)
-//                    }
-//
-//                //Delete transaction from borrowers
-//                for (borrower in trn.borrowers) {
-//                    db.collection("UserData").document(borrower)
-//                        .collection("users").document(borrower)
-//                        .get().addOnSuccessListener { it ->
-//                            transactionIds = (it.get("user_trn") as ArrayList<Any>)
-//                            transactionIds.remove(trn.trn_id)
-//                            db.collection("UserData").document(borrower)
-//                                .collection("users").document(borrower)
-//                                .update("user_trn", transactionIds)
-//                            var Balanceb = it.get("user_bal")
-//                            //If Split is equal
-//                            Balanceb = (Balanceb.toString().toDouble() - (trn.trn_amt / (trn.borrowers.count() + 1)))
-//                            Balanceb = Math.round(Balanceb*100.0)/100.0
-//                            db.collection("UserData").document(borrower)
-//                                .collection("users").document(borrower)
-//                                .update("user_bal", Balanceb)
-//                        }
-//                }
-//
-//                //Delete transaction from the group
-//                db.collection("GroupData").document(groupId)
-//                    .get().addOnSuccessListener { it ->
-//                        transactionIds = (it.get("grp_transactions") as ArrayList<Any>)
-//                        transactionIds.remove(trn.trn_id)
-//                        db.collection("GroupData").document(groupId)
-//                            .update("grp_transactions", transactionIds)
-////                      Update the balance to the group
-//                        var grpBalance = it.get("grp_total")
-//                        grpBalance = (grpBalance.toString().toDouble() - trn.trn_amt)
-//                        grpBalance = Math.round(grpBalance*100.0)/100.0
-//                        db.collection("GroupData").document(groupId)
-//                            .update("grp_total", grpBalance)
-//                    }
-//            }
-//            catch (e: Exception){
-//                System.err.print("Some Error Occurred")
-//            }
-//            dialog?.dismiss()
-//        }
-//        builder.setNegativeButton("No"){
-//                dialog, which-> dialog.dismiss()
-//        }
-//        val alertDialog: AlertDialog = builder.create()
-//        alertDialog.setCancelable(false)
-//        alertDialog.show()
-//    }
 }

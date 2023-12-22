@@ -19,6 +19,7 @@ import com.example.splitease.R
 import com.example.splitease.ui.AddUpdateTransaction.AddTransaction
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import java.io.BufferedReader
 import java.io.StringReader
 import java.lang.Exception
@@ -37,6 +38,7 @@ class TransactionsAdapter (
         val trnTitle = itemView.findViewById<TextView>(R.id.trnTitle)
         val trnAmt = itemView.findViewById<TextView>(R.id.trnAmt)
         val trnDate = itemView.findViewById<TextView>(R.id.trnDate)
+        val trnMonth = itemView.findViewById<TextView>(R.id.trnMonth)
         val editTrn = itemView.findViewById<ImageButton>(R.id.editTrn)
         val deleteTrn = itemView.findViewById<ImageButton>(R.id.deleteTrn)
         val trnImg = itemView.findViewById<ImageView>(R.id.trnImg)
@@ -69,9 +71,10 @@ class TransactionsAdapter (
             }
         }
 
-        val sdf = SimpleDateFormat("dd MMM, EEE")
+        val sdf = SimpleDateFormat("dd")
+        val sdfm = SimpleDateFormat("MMM")
         holder.trnDate.setText(sdf.format(transactionItemModel[position].trn_date))
-
+        holder.trnMonth.setText(sdfm.format(transactionItemModel[position].trn_date))
         db.collection("UserData").document(transactionItemModel[position].lender)
             .collection("users")
             .document(transactionItemModel[position].lender)
