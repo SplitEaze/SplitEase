@@ -69,6 +69,7 @@ class Login : AppCompatActivity() {
                             SharedPref(this@Login).setString(Constants.UUID, user.uid)
                             // Sign in success, update UI with the signed-in user's information
                             startActivity(Intent(this, MainActivity::class.java))
+                            finish()
                         }
                         else {
                             // If sign in fails, display a message to the user.
