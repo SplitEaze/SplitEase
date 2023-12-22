@@ -1,5 +1,6 @@
 package com.example.splitease.ui.DetailedGroup.Adapter
 
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +19,8 @@ import com.example.splitease.R
 import com.example.splitease.ui.AddUpdateTransaction.AddTransaction
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.BufferedReader
+import java.io.StringReader
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -35,6 +39,7 @@ class TransactionsAdapter (
         val trnDate = itemView.findViewById<TextView>(R.id.trnDate)
         val editTrn = itemView.findViewById<ImageButton>(R.id.editTrn)
         val deleteTrn = itemView.findViewById<ImageButton>(R.id.deleteTrn)
+        val trnImg = itemView.findViewById<ImageView>(R.id.trnImg)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -44,10 +49,28 @@ class TransactionsAdapter (
         return ViewHolder(viewHolder)
     }
 
+    @SuppressLint("SetTextI18n", "SimpleDateFormat")
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.trnAmt.text = transactionItemModel[position].trn_amt.toString()
         holder.trnTitle.text = transactionItemModel[position].trn_desc
-        holder.trnDate.text = transactionItemModel[position].trn_date.toString()
+
+        val reader = BufferedReader(StringReader(transactionItemModel[position].trn_desc))
+        val descArray = reader.readLines().flatMap { it.split(" ") }.toTypedArray()
+
+        for(word in descArray){
+            if (word.lowercase() == "hotel"){
+                holder.trnImg.setImageResource(R.drawable.hotel)
+            } else if (word.lowercase() == "food"){
+                holder.trnImg.setImageResource(R.drawable.food)
+            } else if (word.lowercase() == "train"){
+                holder.trnImg.setImageResource(R.drawable.train)
+            } else{
+                holder.trnImg.setImageResource(R.drawable.receipt)
+            }
+        }
+
+        val sdf = SimpleDateFormat("dd MMM, EEE")
+        holder.trnDate.setText(sdf.format(transactionItemModel[position].trn_date))
 
         db.collection("UserData").document(transactionItemModel[position].lender)
             .collection("users")
