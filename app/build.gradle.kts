@@ -63,6 +63,9 @@ dependencies {
 
     implementation("com.intuit.sdp:sdp-android:1.1.0")
 
+    //for refresher layout
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
     // Also add the dependency for the Google Play services library and specify its version
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     testImplementation("junit:junit:4.13.2")

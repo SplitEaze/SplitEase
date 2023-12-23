@@ -16,6 +16,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.splitease.Models.TransactionsModel
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
@@ -40,6 +41,7 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
     private var groupId = ""
     private var transactionIds = ArrayList<Any>()
     private var userIds = ArrayList<Any>()
+    private lateinit var swipe : SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +70,12 @@ class DetailedGroup : AppCompatActivity(), TransactionsAdapter.ItemClickListener
             intent.putExtra("groupId", groupId)
             intent.putExtra("mode", "add")
             startActivity(intent)
+        }
+
+        findViewById<SwipeRefreshLayout>(R.id.swipe).setOnRefreshListener {
+            startActivity(getIntent())
+            finish()
+            overridePendingTransition(0, 0);
         }
     }
 
