@@ -19,17 +19,18 @@
         </activity>
 
         <activity
-            android:name=".ui.Login.Login"
+            android:name=".ui.Startup.Login"
             android:exported="true">
         </activity>
         <activity android:name=".ui.Startup.Signup"
             android:exported="true"/>
         <activity android:name=".ui.Groups.CreateGroup"
             android:exported="true"/>
-        <activity android:name=".ui.DetailedGroup.DetailedGroup"
+        <activity android:name=".ui.Groups.DetailedGroup.DetailedGroup"
             android:exported="true"/>
-
-        <activity android:name=".ui.AddUpdateTransaction.AddTransaction"
+        <activity android:name=".ui.Groups.DetailedGroup.AddUpdateTransaction.AddTransaction"
+            android:exported="true"/>
+        <activity android:name=".ui.Groups.DetailedGroup.SettleUp.SettleUp"
             android:exported="true"/>
 
         <activity

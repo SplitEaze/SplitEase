@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.addTextChangedListener
 import com.example.splitease.MainActivity
 import com.example.splitease.R
-import com.example.splitease.ui.Login.Login
 import com.example.splitease.ui.Utilities.Constants
 import com.example.splitease.ui.Utilities.SharedPref
 import com.google.firebase.auth.FirebaseAuth

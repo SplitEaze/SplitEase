@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.splitease.Models.UserDataModel
 import com.example.splitease.R
-import com.example.splitease.ui.DetailedGroup.DetailedGroup
+import com.example.splitease.ui.Groups.DetailedGroup.DetailedGroup
 import com.example.splitease.ui.Groups.Adapter.GroupsAdapter
 import com.example.splitease.ui.Utilities.Constants
 import com.example.splitease.ui.Utilities.SharedPref
